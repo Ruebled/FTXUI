@@ -43,29 +43,32 @@ Component Tab(Components children, int* selector);
 
 }  // namespace Container
 
+Component Button(ButtonOption options);
 Component Button(ConstStringRef label,
                  std::function<void()> on_click,
-                 Ref<ButtonOption> = ButtonOption::Simple());
+                 ButtonOption options = ButtonOption::Simple());
 
+Component Checkbox(CheckboxOption options);
 Component Checkbox(ConstStringRef label,
                    bool* checked,
-                   Ref<CheckboxOption> option = CheckboxOption::Simple());
+                   CheckboxOption options = CheckboxOption::Simple());
 
-Component Input(StringRef content, Ref<InputOption> option = {});
+Component Input(InputOption options = {});
+Component Input(StringRef content, InputOption options = {});
 Component Input(StringRef content,
                 StringRef placeholder,
-                Ref<InputOption> option = {});
+                InputOption options = {});
 
 Component Menu(ConstStringListRef entries,
                int* selected_,
-               Ref<MenuOption> = MenuOption::Vertical());
-Component MenuEntry(ConstStringRef label, Ref<MenuEntryOption> = {});
+               MenuOption options = MenuOption::Vertical());
+Component MenuEntry(ConstStringRef label, MenuEntryOption options = {});
 
 Component Dropdown(ConstStringListRef entries, int* selected);
 
 Component Radiobox(ConstStringListRef entries,
                    int* selected_,
-                   Ref<RadioboxOption> option = {});
+                   RadioboxOption options = {});
 Component Toggle(ConstStringListRef entries, int* selected);
 
 // General slider constructor:

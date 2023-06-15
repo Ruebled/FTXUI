@@ -67,19 +67,19 @@ bool IsHorizontal(Direction direction) {
 /// @ingroup component
 class MenuBase : public ComponentBase {
  public:
-  MenuBase(ConstStringListRef entries, int* selected, Ref<MenuOption> option)
+  MenuBase(ConstStringListRef entries, int* selected, MenuOption option)
       : entries_(entries), selected_(selected), option_(std::move(option)) {}
 
-  bool IsHorizontal() { return ftxui::IsHorizontal(option_->direction); }
+  bool IsHorizontal() { return ftxui::IsHorizontal(option_.direction); }
   void OnChange() {
-    if (option_->on_change) {
-      option_->on_change();
+    if (option_.on_change) {
+      option_.on_change();
     }
   }
 
   void OnEnter() {
-    if (option_->on_enter) {
-      option_->on_enter();
+    if (option_.on_enter) {
+      option_.on_enter();
     }
   }
 
@@ -111,13 +111,13 @@ class MenuBase : public ComponentBase {
 
     Elements elements;
     const bool is_menu_focused = Focused();
-    if (option_->elements_prefix) {
-      elements.push_back(option_->elements_prefix());
+    if (option_.elements_prefix) {
+      elements.push_back(option_.elements_prefix());
     }
     elements.reserve(size());
     for (int i = 0; i < size(); ++i) {
-      if (i != 0 && option_->elements_infix) {
-        elements.push_back(option_->elements_infix());
+      if (i != 0 && option_.elements_infix) {
+        elements.push_back(option_.elements_infix());
       }
       const bool is_focused = (focused_entry() == i) && is_menu_focused;
       const bool is_selected = (*selected_ == i);
@@ -133,24 +133,24 @@ class MenuBase : public ComponentBase {
           is_menu_focused && (selected_focus_ == i) ? focus : nothing;
 
       const Element element =
-          (option_->entries.transform ? option_->entries.transform
+          (option_.entries.transform ? option_.entries.transform
                                       : DefaultOptionTransform)  //
           (state);
       elements.push_back(element | AnimatedColorStyle(i) | reflect(boxes_[i]) |
                          focus_management);
     }
-    if (option_->elements_postfix) {
-      elements.push_back(option_->elements_postfix());
+    if (option_.elements_postfix) {
+      elements.push_back(option_.elements_postfix());
     }
 
-    if (IsInverted(option_->direction)) {
+    if (IsInverted(option_.direction)) {
       std::reverse(elements.begin(), elements.end());
     }
 
     const Element bar =
         IsHorizontal() ? hbox(std::move(elements)) : vbox(std::move(elements));
 
-    if (!option_->underline.enabled) {
+    if (!option_.underline.enabled) {
       return bar | reflect(box_);
     }
 
@@ -158,15 +158,15 @@ class MenuBase : public ComponentBase {
       return vbox({
                  bar | xflex,
                  separatorHSelector(first_, second_,  //
-                                    option_->underline.color_active,
-                                    option_->underline.color_inactive),
+                                    option_.underline.color_active,
+                                    option_.underline.color_inactive),
              }) |
              reflect(box_);
     } else {
       return hbox({
                  separatorVSelector(first_, second_,  //
-                                    option_->underline.color_active,
-                                    option_->underline.color_inactive),
+                                    option_.underline.color_active,
+                                    option_.underline.color_inactive),
                  bar | yflex,
              }) |
              reflect(box_);
@@ -179,7 +179,7 @@ class MenuBase : public ComponentBase {
   }
 
   void OnUp() {
-    switch (option_->direction) {
+    switch (option_.direction) {
       case Direction::Up:
         (*selected_)++;
         break;
@@ -193,7 +193,7 @@ class MenuBase : public ComponentBase {
   }
 
   void OnDown() {
-    switch (option_->direction) {
+    switch (option_.direction) {
       case Direction::Up:
         (*selected_)--;
         break;
@@ -207,7 +207,7 @@ class MenuBase : public ComponentBase {
   }
 
   void OnLeft() {
-    switch (option_->direction) {
+    switch (option_.direction) {
       case Direction::Left:
         (*selected_)++;
         break;
@@ -221,7 +221,7 @@ class MenuBase : public ComponentBase {
   }
 
   void OnRight() {
-    switch (option_->direction) {
+    switch (option_.direction) {
       case Direction::Left:
         (*selected_)--;
         break;
@@ -386,36 +386,36 @@ class MenuBase : public ComponentBase {
       if (animator_background_[i].to() != target) {
         animator_background_[i] = animation::Animator(
             &animation_background_[i], target,
-            option_->entries.animated_colors.background.duration,
-            option_->entries.animated_colors.background.function);
+            option_.entries.animated_colors.background.duration,
+            option_.entries.animated_colors.background.function);
         animator_foreground_[i] = animation::Animator(
             &animation_foreground_[i], target,
-            option_->entries.animated_colors.foreground.duration,
-            option_->entries.animated_colors.foreground.function);
+            option_.entries.animated_colors.foreground.duration,
+            option_.entries.animated_colors.foreground.function);
       }
     }
   }
 
   Decorator AnimatedColorStyle(int i) {
     Decorator style = nothing;
-    if (option_->entries.animated_colors.foreground.enabled) {
+    if (option_.entries.animated_colors.foreground.enabled) {
       style = style | color(Color::Interpolate(
                           animation_foreground_[i],
-                          option_->entries.animated_colors.foreground.inactive,
-                          option_->entries.animated_colors.foreground.active));
+                          option_.entries.animated_colors.foreground.inactive,
+                          option_.entries.animated_colors.foreground.active));
     }
 
-    if (option_->entries.animated_colors.background.enabled) {
+    if (option_.entries.animated_colors.background.enabled) {
       style = style | bgcolor(Color::Interpolate(
                           animation_background_[i],
-                          option_->entries.animated_colors.background.inactive,
-                          option_->entries.animated_colors.background.active));
+                          option_.entries.animated_colors.background.inactive,
+                          option_.entries.animated_colors.background.active));
     }
     return style;
   }
 
   void UpdateUnderlineTarget() {
-    if (!option_->underline.enabled) {
+    if (!option_.underline.enabled) {
       return;
     }
 
@@ -426,27 +426,27 @@ class MenuBase : public ComponentBase {
 
     if (FirstTarget() >= animator_first_.to()) {
       animator_first_ = animation::Animator(
-          &first_, FirstTarget(), option_->underline.follower_duration,
-          option_->underline.follower_function,
-          option_->underline.follower_delay);
+          &first_, FirstTarget(), option_.underline.follower_duration,
+          option_.underline.follower_function,
+          option_.underline.follower_delay);
 
       animator_second_ = animation::Animator(
-          &second_, SecondTarget(), option_->underline.leader_duration,
-          option_->underline.leader_function, option_->underline.leader_delay);
+          &second_, SecondTarget(), option_.underline.leader_duration,
+          option_.underline.leader_function, option_.underline.leader_delay);
     } else {
       animator_first_ = animation::Animator(
-          &first_, FirstTarget(), option_->underline.leader_duration,
-          option_->underline.leader_function, option_->underline.leader_delay);
+          &first_, FirstTarget(), option_.underline.leader_duration,
+          option_.underline.leader_function, option_.underline.leader_delay);
 
       animator_second_ = animation::Animator(
-          &second_, SecondTarget(), option_->underline.follower_duration,
-          option_->underline.follower_function,
-          option_->underline.follower_delay);
+          &second_, SecondTarget(), option_.underline.follower_duration,
+          option_.underline.follower_function,
+          option_.underline.follower_delay);
     }
   }
 
   bool Focusable() const final { return entries_.size(); }
-  int& focused_entry() { return option_->focused_entry(); }
+  int& focused_entry() { return option_.focused_entry(); }
   int size() const { return int(entries_.size()); }
   float FirstTarget() {
     if (boxes_.empty()) {
@@ -470,7 +470,7 @@ class MenuBase : public ComponentBase {
   int* selected_;
   int selected_previous_ = *selected_;
   int selected_focus_ = *selected_;
-  Ref<MenuOption> option_;
+  MenuOption option_;
 
   std::vector<Box> boxes_;
   Box box_;
@@ -515,7 +515,7 @@ class MenuBase : public ComponentBase {
 /// ```
 Component Menu(ConstStringListRef entries,
                int* selected,
-               Ref<MenuOption> option) {
+               MenuOption option) {
   return Make<MenuBase>(entries, selected, std::move(option));
 }
 
@@ -554,10 +554,10 @@ Component Toggle(ConstStringListRef entries, int* selected) {
 ///   entry 2
 ///   entry 3
 /// ```
-Component MenuEntry(ConstStringRef label, Ref<MenuEntryOption> option) {
+Component MenuEntry(ConstStringRef label, MenuEntryOption option) {
   class Impl : public ComponentBase {
    public:
-    Impl(ConstStringRef label, Ref<MenuEntryOption> option)
+    Impl(ConstStringRef label, MenuEntryOption option)
         : label_(std::move(label)), option_(std::move(option)) {}
 
    private:
@@ -573,7 +573,7 @@ Component MenuEntry(ConstStringRef label, Ref<MenuEntryOption> option) {
       };
 
       const Element element =
-          (option_->transform ? option_->transform : DefaultOptionTransform)  //
+          (option_.transform ? option_.transform : DefaultOptionTransform)  //
           (state);
 
       auto focus_management = focused ? select : nothing;
@@ -588,28 +588,28 @@ Component MenuEntry(ConstStringRef label, Ref<MenuEntryOption> option) {
       }
       animator_background_ =
           animation::Animator(&animation_background_, target,
-                              option_->animated_colors.background.duration,
-                              option_->animated_colors.background.function);
+                              option_.animated_colors.background.duration,
+                              option_.animated_colors.background.function);
       animator_foreground_ =
           animation::Animator(&animation_foreground_, target,
-                              option_->animated_colors.foreground.duration,
-                              option_->animated_colors.foreground.function);
+                              option_.animated_colors.foreground.duration,
+                              option_.animated_colors.foreground.function);
     }
 
     Decorator AnimatedColorStyle() {
       Decorator style = nothing;
-      if (option_->animated_colors.foreground.enabled) {
+      if (option_.animated_colors.foreground.enabled) {
         style = style | color(Color::Interpolate(
                             animation_foreground_,
-                            option_->animated_colors.foreground.inactive,
-                            option_->animated_colors.foreground.active));
+                            option_.animated_colors.foreground.inactive,
+                            option_.animated_colors.foreground.active));
       }
 
-      if (option_->animated_colors.background.enabled) {
+      if (option_.animated_colors.background.enabled) {
         style = style | bgcolor(Color::Interpolate(
                             animation_background_,
-                            option_->animated_colors.background.inactive,
-                            option_->animated_colors.background.active));
+                            option_.animated_colors.background.inactive,
+                            option_.animated_colors.background.active));
       }
       return style;
     }
@@ -641,7 +641,7 @@ Component MenuEntry(ConstStringRef label, Ref<MenuEntryOption> option) {
     }
 
     ConstStringRef label_;
-    Ref<MenuEntryOption> option_;
+    MenuEntryOption option_;
     Box box_;
     bool hovered_ = false;
 

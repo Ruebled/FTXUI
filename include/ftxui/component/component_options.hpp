@@ -115,6 +115,9 @@ struct ButtonOption {
                                Color background_active,
                                Color foreground_active);
 
+  ConstStringRef label = "Button";
+  std::function<void()> on_click = [] {};
+
   // Style:
   std::function<Element(const EntryState&)> transform;
   AnimatedColorsOption animated_colors;
@@ -125,6 +128,10 @@ struct ButtonOption {
 struct CheckboxOption {
   // Standard constructors:
   static CheckboxOption Simple();
+
+  ConstStringRef label = "Checkbox";
+
+  Ref<bool> checked = false;
 
   // Style:
   std::function<Element(const EntryState&)> transform;
@@ -152,6 +159,9 @@ struct InputOption {
   static InputOption Default();
   /// @brief A white on black style with high margins:
   static InputOption Spacious();
+
+  /// The content of the input.
+  StringRef content = "";
 
   /// The content of the input when it's empty.
   StringRef placeholder = "";

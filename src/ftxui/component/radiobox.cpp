@@ -25,7 +25,7 @@ class RadioboxBase : public ComponentBase {
  public:
   RadioboxBase(ConstStringListRef entries,
                int* selected,
-               Ref<RadioboxOption> option)
+               RadioboxOption option)
       : entries_(entries), selected_(selected), option_(std::move(option)) {}
 
  private:
@@ -47,7 +47,7 @@ class RadioboxBase : public ComponentBase {
           is_focused,
       };
       auto element =
-          (option_->transform ? option_->transform
+          (option_.transform ? option_.transform
                               : RadioboxOption::Simple().transform)(state);
 
       elements.push_back(element | focus_management | reflect(boxes_[i]));
@@ -97,14 +97,14 @@ class RadioboxBase : public ComponentBase {
 
       if (hovered_ != old_hovered) {
         focused_entry() = hovered_;
-        option_->on_change();
+        option_.on_change();
         return true;
       }
     }
 
     if (event == Event::Character(' ') || event == Event::Return) {
       *selected_ = hovered_;
-      option_->on_change();
+      option_.on_change();
       return true;
     }
 
@@ -128,7 +128,7 @@ class RadioboxBase : public ComponentBase {
           event.mouse().motion == Mouse::Released) {
         if (*selected_ != i) {
           *selected_ = i;
-          option_->on_change();
+          option_.on_change();
         }
 
         return true;
@@ -154,7 +154,7 @@ class RadioboxBase : public ComponentBase {
     hovered_ = util::clamp(hovered_, 0, size() - 1);
 
     if (hovered_ != old_hovered) {
-      option_->on_change();
+      option_.on_change();
     }
 
     return true;
@@ -168,7 +168,7 @@ class RadioboxBase : public ComponentBase {
   }
 
   bool Focusable() const final { return entries_.size(); }
-  int& focused_entry() { return option_->focused_entry(); }
+  int& focused_entry() { return option_.focused_entry(); }
   int size() const { return int(entries_.size()); }
 
   ConstStringListRef entries_;
@@ -176,7 +176,7 @@ class RadioboxBase : public ComponentBase {
   int hovered_ = *selected_;
   std::vector<Box> boxes_;
   Box box_;
-  Ref<RadioboxOption> option_;
+  RadioboxOption option_;
 };
 
 }  // namespace
@@ -211,7 +211,7 @@ class RadioboxBase : public ComponentBase {
 /// ```
 Component Radiobox(ConstStringListRef entries,
                    int* selected,
-                   Ref<RadioboxOption> option) {
+                   RadioboxOption option) {
   return Make<RadioboxBase>(entries, selected, std::move(option));
 }
 

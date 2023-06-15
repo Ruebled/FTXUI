@@ -52,7 +52,7 @@ TEST(MenuTest, DirectionDown) {
   int selected = 0;
   std::vector<std::string> entries = {"1", "2", "3"};
   MenuOption option;
-  auto menu = Menu(&entries, &selected, &option);
+  auto menu = Menu(&entries, &selected, option);
 
   selected = 0;
   option.direction = Direction::Down;
@@ -81,7 +81,7 @@ TEST(MenuTest, DirectionsUp) {
   int selected = 0;
   std::vector<std::string> entries = {"1", "2", "3"};
   MenuOption option;
-  auto menu = Menu(&entries, &selected, &option);
+  auto menu = Menu(&entries, &selected, option);
   option.direction = Direction::Up;
   Screen screen(4, 3);
   Render(screen, menu->Render());
@@ -107,7 +107,7 @@ TEST(MenuTest, DirectionsRight) {
   int selected = 0;
   std::vector<std::string> entries = {"1", "2", "3"};
   MenuOption option;
-  auto menu = Menu(&entries, &selected, &option);
+  auto menu = Menu(&entries, &selected, option);
   option.direction = Direction::Right;
   Screen screen(10, 1);
   Render(screen, menu->Render());
@@ -133,7 +133,7 @@ TEST(MenuTest, DirectionsLeft) {
   int selected = 0;
   std::vector<std::string> entries = {"1", "2", "3"};
   MenuOption option;
-  auto menu = Menu(&entries, &selected, &option);
+  auto menu = Menu(&entries, &selected, option);
   option.direction = Direction::Left;
   Screen screen(10, 1);
   Render(screen, menu->Render());
@@ -159,7 +159,7 @@ TEST(MenuTest, AnimationsHorizontal) {
   int selected = 0;
   std::vector<std::string> entries = {"1", "2", "3"};
   auto option = MenuOption::HorizontalAnimated();
-  auto menu = Menu(&entries, &selected, &option);
+  auto menu = Menu(&entries, &selected, option);
   {
     Screen screen(4, 3);
     Render(screen, menu->Render());
@@ -196,7 +196,7 @@ TEST(MenuTest, AnimationsVertical) {
   int selected = 0;
   std::vector<std::string> entries = {"1", "2", "3"};
   auto option = MenuOption::VerticalAnimated();
-  auto menu = Menu(&entries, &selected, &option);
+  auto menu = Menu(&entries, &selected, option);
   {
     Screen screen(10, 3);
     Render(screen, menu->Render());
